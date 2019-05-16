@@ -67,7 +67,7 @@ type Nic struct {
 }
 
 func (n *Nic) Free() (err error) {
-	_, err = db.Exec("UPDATE addr_tab SET guest_id='', state=?, host_id=0 WHERE id=?",
+	_, err = db.Exec("UPDATE addr_tab SET guest_id=0, state=?, host_id=0 WHERE id=?",
 		common.AddrStatusFree, n.ID)
 	return
 }
