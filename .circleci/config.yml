@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: projecteru2/yaviv:0.1
+    working_directory: /.go/src/github.com/projecteru2/yavirt
+    steps:
+      - checkout
+      - run: make deps
+      - run: make test
+      - run: make
