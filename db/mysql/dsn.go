@@ -13,7 +13,7 @@ func (d *Dsn) String() string {
 	var str strings.Builder
 
 	if len(d.User) > 0 {
-		str.WriteString(fmt.Sprintf("%s:%s", d.User, d.Password))
+		str.WriteString(fmt.Sprintf("%s:%s@", d.User, d.Password))
 	}
 
 	str.WriteString(d.Proto)
