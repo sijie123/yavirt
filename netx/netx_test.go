@@ -30,3 +30,17 @@ func TestIPv4ToInt(t *testing.T) {
 		assert.Equal(t, c.out, i)
 	}
 }
+
+func TestRealAddAddr(t *testing.T) {
+	var ips = []string{
+		"10.129.98.213",
+		"10.129.98.214",
+		"10.129.98.215",
+		"10.129.98.217",
+	}
+	for _, c := range ips {
+		var i, err = IPv4ToInt(c)
+		assert.NilErr(t, err)
+		t.Logf("=== %d ===", i)
+	}
+}

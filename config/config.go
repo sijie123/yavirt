@@ -52,9 +52,7 @@ func newDefault() Config {
 		panic(err)
 	}
 
-	conf.VirtFlockDir = filepath.Join(conf.VirtDir, "flock")
-	conf.VirtTmplDir = filepath.Join(conf.VirtDir, "template")
-	conf.VirtSockDir = filepath.Join(conf.VirtDir, "sock")
+	conf.loadVirtDirs()
 
 	return conf
 }
@@ -72,5 +70,14 @@ func (c *Config) load(file string) error {
 	if err := DecodeFile(file, c); err != nil {
 		return errors.Trace(err)
 	}
+
+	c.loadVirtDirs()
+
 	return nil
+}
+
+func (c *Config) loadVirtDirs() {
+	c.VirtFlockDir = filepath.Join(c.VirtDir, "flock")
+	c.VirtTmplDir = filepath.Join(c.VirtDir, "template")
+	c.VirtSockDir = filepath.Join(c.VirtDir, "sock")
 }
