@@ -261,11 +261,6 @@ func (g *Guest) create() error {
 	return g.botOperate(func(bot Bot) error {
 		return util.Invoke([]func() error{
 			bot.Create,
-
-			g.setStarting,
-			bot.Boot,
-
-			g.setRunning,
 		})
 	})
 }

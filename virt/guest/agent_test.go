@@ -44,19 +44,27 @@ func TestAgent(t *testing.T) {
 	qmp.AssertExpectations(t)
 }
 
+/*
 func TestRealAgent(t *testing.T) {
-	// var agent = NewAgent("/tmp/virt/sock/guest-000001.sock")
-	// assert.NilErr(t, agent.Ping(context.Background()))
+	var agent = NewAgent("/tmp/virt/sock/guest-000001.sock")
+	assert.NilErr(t, agent.Ping(context.Background()))
 
-	// var st = <-agent.ExecOutput(context.Background(), "ls", "-l", "/")
-	// assert.NotNil(t, st)
-	// assert.NilErr(t, st.Error())
+	var st = <-agent.Exec(context.Background(), "echo")
+	assert.NotNil(t, st)
+	assert.NilErr(t, st.Error())
 
-	// so, err := st.Stdout()
-	// assert.NilErr(t, err)
-	// t.Logf("%s", so)
+	st = <-agent.ExecOutput(context.Background(), "ls", "-l", "/")
+	assert.NotNil(t, st)
+	assert.NilErr(t, st.Error())
 
-	// se, err := st.Stderr()
-	// assert.NilErr(t, err)
-	// assert.Equal(t, 0, len(se))
+	time.Sleep(time.Minute)
+
+	so, err := st.Stdout()
+	assert.NilErr(t, err)
+	t.Logf("%s", so)
+
+	se, err := st.Stderr()
+	assert.NilErr(t, err)
+	assert.Equal(t, 0, len(se))
 }
+*/

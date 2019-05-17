@@ -57,8 +57,12 @@ func TestLifecycle(t *testing.T) {
 	assert.Equal(t, common.StatusPending, guest.sysVol.Status)
 
 	bot.On("Create").Return(nil)
-	bot.On("Boot").Return(nil)
 	assert.NilErr(t, guest.Create())
+	assert.Equal(t, common.StatusCreating, guest.Status)
+	assert.Equal(t, common.StatusCreating, guest.sysVol.Status)
+
+	bot.On("Boot").Return(nil)
+	assert.NilErr(t, guest.Start())
 	assert.Equal(t, common.StatusRunning, guest.Status)
 	assert.Equal(t, common.StatusRunning, guest.sysVol.Status)
 

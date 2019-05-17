@@ -10,14 +10,15 @@ import (
 )
 
 func TestRealReq(t *testing.T) {
-	var cli, err = New("127.0.0.1:9696", "v1")
-	assert.NilErr(t, err)
-	assert.NotNil(t, cli)
+	// var cli, err = New("127.0.0.1:9696", "v1")
+	// assert.NilErr(t, err)
+	// assert.NotNil(t, cli)
 
 	// var g = testCreate(t, cli)
 	// var id = g.ID
 	// t.Logf("=== id: %s ===", id)
 
+	// var id = "SHOPEE-YET-ANOTHER-VIRT-2019042900000000000000000000000000000002"
 	// testStop(t, cli, id)
 	// testStart(t, cli, id)
 	// testStop(t, cli, id)
