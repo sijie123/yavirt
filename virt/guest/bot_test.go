@@ -61,7 +61,7 @@ func TestRealBot(t *testing.T) {
 	guest.Image = &image.Image{Name: "centos7"}
 	guest.Image.ID = 1
 
-	ui32, err := netx.IPv4ToInt("192.168.1.1")
+	intip, err := netx.IPv4ToInt("192.168.1.1")
 	assert.NilErr(t, err)
 
 	guest.sysVol = &volume.Volume{}
@@ -70,8 +70,9 @@ func TestRealBot(t *testing.T) {
 	guest.vols.Append(guest.sysVol)
 	guest.nics = []*nic.Nic{
 		&nic.Nic{
-			LowValue: ui32,
+			LowValue: intip,
 			Prefix:   24,
+			Gateway:  "192.168.1.254",
 		},
 	}
 
@@ -82,6 +83,10 @@ func TestRealBot(t *testing.T) {
 	// assert.NilErr(t, bot.Create())
 	// assert.NilErr(t, bot.Create())
 	// assert.NilErr(t, bot.Create())
+
+	// assert.NilErr(t, bot.Boot())
+	// assert.NilErr(t, bot.Boot())
+	// assert.NilErr(t, bot.Boot())
 
 	// assert.NilErr(t, bot.Shutdown())
 	// assert.NilErr(t, bot.Shutdown())

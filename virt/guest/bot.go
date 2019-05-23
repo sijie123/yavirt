@@ -86,8 +86,29 @@ func (v *virtGuest) postBoot() error {
 	var ctx, cancel = context.WithTimeout(context.Background(), time.Minute*30)
 	defer cancel()
 
-	if err := v.ga.Ping(ctx); err != nil {
-		return errors.Trace(err)
+	for i := 1; ; i++ {
+		if err := v.ga.Ping(ctx); err != nil {
+			select {
+			case <-ctx.Done():
+				return errors.Trace(err)
+
+			default:
+				log.Warnf(errors.ErrorStack(err))
+
+				if err := v.ga.Close(); err != nil {
+					return errors.Trace(err)
+				}
+
+				i %= 10
+				time.Sleep(time.Second * time.Duration(i))
+
+				v.reloadGA()
+
+				continue
+			}
+		}
+
+		break
 	}
 
 	return v.setNics()
@@ -151,11 +172,24 @@ func (v *virtGuest) setNics() error {
 	for i, nic := range v.guest.nics {
 		var dev = fmt.Sprintf("eth%d", i)
 
-		var st = <-v.ga.Exec(ctx, "ip", "a", "add", nic.IP(), "dev", dev)
-		if st.Error() != nil {
-			return errors.Annotatef(st.Error(), "failed to `ip a add %s dev %s`", nic.IP(), dev)
+		var cmds = [][]interface{}{
+			[]interface{}{"ip", "a", "add", nic.IP(), "dev", dev},
+			[]interface{}{"ip", "link", "set", dev, "up"},
+			[]interface{}{"ip", "route", "add", "default", "via", nic.Gateway},
+		}
+
+		for _, args := range cmds {
+
+			var st = <-v.ga.ExecOutput(ctx, args[0].(string), args[1:]...)
+			if st.Error() != nil {
+				return errors.Annotatef(st.Error(), "failed to %v", args)
+			}
 		}
 	}
 
 	return nil
+}
+
+func (v *virtGuest) reloadGA() {
+	v.ga = NewAgent(v.guest.sockfile())
 }
