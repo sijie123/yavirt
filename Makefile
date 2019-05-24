@@ -14,8 +14,10 @@ PKGS := $$($(GO) list ./... | grep -v vendor/)
 
 default: build
 
-build: format
+build: lint
 	$(BUILD) -ldflags '$(LDFLAGS)' -o bin/yavirtd yavirtd.go
+
+lint: format
 
 format:
 	$(GO) vet $(PKGS)

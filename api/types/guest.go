@@ -37,4 +37,5 @@ type Guest struct {
 	Mem       int64
 	ImageID   int64
 	ImageName string
+	Networks  map[string]string
 }

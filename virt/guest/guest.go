@@ -355,6 +355,14 @@ func (g *Guest) deleteNics() error {
 	return nil
 }
 
+func (g *Guest) IPAddrs() []string {
+	var addrs = make([]string, len(g.nics))
+	for i, n := range g.nics {
+		addrs[i] = n.IP()
+	}
+	return addrs
+}
+
 func (g *Guest) insert() error {
 	var fields = []string{"image_id", "host_id", "cpu", "mem", "state", "create_time"}
 	var res, err = db.Insert(g, "guest_tab", fields...)
