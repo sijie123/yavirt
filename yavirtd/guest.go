@@ -68,7 +68,7 @@ func (s *apiServer) CreateGuest(c *gin.Context) {
 			return nil, err
 		}
 
-		vm, err := guest.Create(req.Cpu, req.Mem, imgID, s.yav.host.ID)
+		vm, err := guest.Create(req.Cpu, req.Mem, imgID, s.yav.host)
 		if err != nil {
 			return nil, err
 		}

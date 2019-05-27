@@ -40,8 +40,8 @@ initdev:
 	mysql -e 'DROP DATABASE test; CREATE DATABASE test'
 	$(GO) run yavirtd.go --init
 	mysql test < schema/init.sql
-	mysql test -e "INSERT host_tab (hostname) SELECT '`hostname`'"
-	mysql test -e "INSERT addr_tab (low_value, prefix, state, host_id) SELECT 3232235777, 24, 'free', 1"
+	mysql test -e "INSERT host_tab (hostname, subnet) SELECT '`hostname`', 12625921"
+	mysql test -e "INSERT addr_tab (low_value, prefix, gateway, state, host_subnet) SELECT 3232235777, 24, '192.168.122.254', 'free', 12625921"
 
 rundev:
 	sudo GOPATH=$(GOPATH) $(GO) run yavirtd.go

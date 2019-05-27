@@ -1,11 +1,14 @@
 package guest
 
 import (
+	_ "os"
 	"testing"
 
 	"github.com/projecteru2/yavirt/test/assert"
 	"github.com/projecteru2/yavirt/test/mock"
+	_ "github.com/projecteru2/yavirt/util"
 	"github.com/projecteru2/yavirt/virt/common"
+	"github.com/projecteru2/yavirt/virt/host"
 	"github.com/projecteru2/yavirt/virt/image"
 	"github.com/projecteru2/yavirt/virt/nic"
 	"github.com/projecteru2/yavirt/virt/test"
@@ -50,6 +53,7 @@ func TestLifecycle(t *testing.T) {
 	defer cancel()
 
 	var guest, bot = newMockedGuest()
+	guest.host = &host.Host{ID: 1, Subnet: 12625921}
 
 	assert.NilErr(t, guest.Insert())
 
@@ -156,4 +160,21 @@ func newMockedGuest() (*Guest, *mockBot) {
 	}
 
 	return guest, mbot
+}
+
+func TestRealGuest(t *testing.T) {
+	// hn, err := os.Hostname()
+	// assert.NilErr(t, err)
+
+	// phy, err := host.LoadByHost(hn)
+	// assert.NilErr(t, err)
+
+	// guest, err := Create(1, util.GB, 1, phy)
+	// assert.Nil(t, err)
+	// assert.NotNil(t, guest)
+
+	// gid := guest.ID
+	// //gid := 1
+	// assert.NilErr(t, Start(gid))
+	// assert.NilErr(t, Start(gid))
 }

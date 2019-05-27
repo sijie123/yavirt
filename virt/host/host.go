@@ -6,12 +6,13 @@ import (
 	"github.com/projecteru2/yavirt/db"
 )
 
-const selectQuery = "SELECT id, hostname, host_type, state, cpu, mem FROM host_tab"
+const selectQuery = "SELECT id, hostname, host_type, subnet, state, cpu, mem FROM host_tab"
 
 type Host struct {
 	ID     int64
 	Host   string `db:"hostname"`
 	Type   string `db:"host_type"`
+	Subnet int64
 	Status string `db:"state"`
 	Cpu    int
 	Mem    int64

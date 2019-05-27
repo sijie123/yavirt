@@ -120,7 +120,7 @@ func (m *Mysql) SelectForUpdate(ctx context.Context,
 
 	for {
 		if err := tx.GetContext(ctx, obj, selectQuery); err != nil {
-			return errors.Trace(err)
+			return errors.Annotatef(err, "failed to '%s'", selectQuery)
 		}
 
 		var res, err = tx.ExecContext(ctx, getUpdateQuery(obj))

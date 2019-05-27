@@ -15,22 +15,22 @@ import (
 	"github.com/projecteru2/yavirt/metric"
 	"github.com/projecteru2/yavirt/util"
 	"github.com/projecteru2/yavirt/virt/common"
+	"github.com/projecteru2/yavirt/virt/host"
 	"github.com/projecteru2/yavirt/virt/image"
 	"github.com/projecteru2/yavirt/virt/nic"
 	"github.com/projecteru2/yavirt/virt/volume"
 )
 
-func New(cpu int, mem, imageID, hostID int64) (guest *Guest) {
-	guest = &Guest{
+func New(cpu int, mem, imageID, hostID int64) *Guest {
+	return &Guest{
 		Cpu:     cpu,
 		Mem:     mem,
 		ImageID: imageID,
 		HostID:  hostID,
-		vols:    volume.NewVolumes(),
-		nics:    []*nic.Nic{},
-	}
 
-	return
+		vols: volume.NewVolumes(),
+		nics: []*nic.Nic{},
+	}
 }
 
 func Destroy(id int64) error {
@@ -59,8 +59,9 @@ func ctrl(id int64, fn func(*Guest) error) error {
 	return fn(g)
 }
 
-func Create(cpu int, mem, imageID, hostID int64) (*Guest, error) {
-	var guest = New(cpu, mem, imageID, hostID)
+func Create(cpu int, mem, imageID int64, phy *host.Host) (*Guest, error) {
+	var guest = New(cpu, mem, imageID, phy.ID)
+	guest.host = phy
 
 	var err = util.Invoke([]func() error{
 		guest.LoadImage,
@@ -161,13 +162,12 @@ type Guest struct {
 	HostID  int64 `db:"host_id"`
 	Cpu     int
 	Mem     int64
+	Image   *image.Image
 
-	Image *image.Image
-
+	host   *host.Host
 	vols   volume.VolumesOp
 	sysVol *volume.Volume
-
-	nics []*nic.Nic
+	nics   []*nic.Nic
 
 	newBot func(*Guest) (Bot, error)
 }
@@ -336,7 +336,7 @@ func (g *Guest) insertVolume() error {
 }
 
 func (g *Guest) insertNic() error {
-	var n, err = nic.Alloc(g.ID, g.HostID)
+	var n, err = nic.Alloc(g.ID, g.host.Subnet)
 	if err != nil {
 		return errors.Trace(err)
 	}

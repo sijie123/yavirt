@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS host_tab (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   hostname VARCHAR(128) NOT NULL,
   host_type CHAR(4) NOT NULL,
+  subnet INT NOT NULL DEFAULT 0,
   state VARCHAR(16) NOT NULL,
   cpu INT NOT NULL DEFAULT 1,
   mem BIGINT not NULL DEFAULT 1073741824,
@@ -76,7 +77,9 @@ CREATE TABLE IF NOT EXISTS addr_tab (
   addr_type VARCHAR(16) NOT NULL,
   state VARCHAR(16) NOT NULL,
   host_id INT NOT NULL,
+  host_subnet INT NOT NULL DEFAULT 0,
   KEY idx_state (state),
+  KEY idx_hostsubnet (host_subnet),
   UNIQUE KEY idx_value (low_value, high_value, addr_type)
 ) ENGINE=InnoDB COLLATE utf8mb4_unicode_ci`,
 }
