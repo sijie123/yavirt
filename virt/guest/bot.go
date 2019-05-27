@@ -1,6 +1,7 @@
 package guest
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"path/filepath"
@@ -111,7 +112,7 @@ func (v *virtGuest) postBoot() error {
 		break
 	}
 
-	return v.setNics()
+	return v.setupNics()
 }
 
 func (v *virtGuest) Shutdown() error {
@@ -164,7 +165,7 @@ func (v *virtGuest) newFlock() *util.Flock {
 	return util.NewFlock(fpth)
 }
 
-func (v *virtGuest) setNics() error {
+func (v *virtGuest) setupNics() error {
 	var leng = time.Duration(len(v.guest.nics))
 	var ctx, cancel = context.WithTimeout(context.Background(), time.Minute*leng)
 	defer cancel()
@@ -172,19 +173,51 @@ func (v *virtGuest) setNics() error {
 	for i, nic := range v.guest.nics {
 		var dev = fmt.Sprintf("eth%d", i)
 
-		var cmds = [][]interface{}{
-			[]interface{}{"ip", "a", "add", nic.IP(), "dev", dev},
-			[]interface{}{"ip", "link", "set", dev, "up"},
-			[]interface{}{"ip", "route", "add", "default", "via", nic.Gateway},
+		if err := v.addIP(ctx, nic.IP(), dev); err != nil {
+			return errors.Trace(err)
 		}
 
-		for _, args := range cmds {
-
-			var st = <-v.ga.ExecOutput(ctx, args[0].(string), args[1:]...)
-			if st.Error() != nil {
-				return errors.Annotatef(st.Error(), "failed to %v", args)
-			}
+		if err := v.enableNic(ctx, dev); err != nil {
+			return errors.Trace(err)
 		}
+
+		if err := v.addRoute(ctx, nic.Gateway); err != nil {
+			return errors.Trace(err)
+		}
+	}
+
+	return nil
+}
+
+func (v *virtGuest) enableNic(ctx context.Context, dev string) error {
+	var st = <-v.ga.Exec(ctx, "ip", "link", "set", dev, "up")
+	if err := st.Error(); err != nil {
+		return errors.Trace(err)
+	}
+	return nil
+}
+
+func (v *virtGuest) addRoute(ctx context.Context, gateway string) error {
+	return v.doIP(ctx, "ip", "route", "add", "default", "via", gateway)
+}
+
+func (v *virtGuest) addIP(ctx context.Context, ip, dev string) error {
+	return v.doIP(ctx, "ip", "a", "add", ip, "dev", dev)
+}
+
+func (v *virtGuest) doIP(ctx context.Context, cmd string, args ...interface{}) error {
+	var st = <-v.ga.ExecOutput(ctx, cmd, args...)
+
+	if err := st.Error(); err != nil {
+		var chk = func(so, se []byte) bool {
+			return bytes.HasSuffix(bytes.Trim(se, "\n"), []byte(" File exists"))
+		}
+
+		if xe := st.CheckStdio(chk); xe != nil {
+			return errors.Wrap(err, xe)
+		}
+
+		return nil
 	}
 
 	return nil

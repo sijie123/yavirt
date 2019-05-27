@@ -120,6 +120,29 @@ type ExecStatus struct {
 	err error
 }
 
+func (s ExecStatus) CheckStdio(check func(so, se []byte) bool) error {
+	var err = s.Error()
+	if err == nil {
+		return nil
+	}
+
+	so, xe := s.Stdout()
+	if xe != nil {
+		return errors.Wrap(err, xe)
+	}
+
+	se, xe := s.Stderr()
+	if xe != nil {
+		return errors.Wrap(err, xe)
+	}
+
+	if check(so, se) {
+		return nil
+	}
+
+	return err
+}
+
 func (s ExecStatus) Stdout() ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s.Base64Out)
 }
