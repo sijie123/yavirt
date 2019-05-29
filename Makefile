@@ -24,7 +24,8 @@ format:
 	$(GO) fmt $(PKGS)
 
 deps:
-	GOPATH=$(GOPATH) dep ensure
+	GO111MODULE=on GOPATH=$(GOPATH) go mod download
+	GO111MODULE=on GOPATH=$(GOPATH) go mod vendor
 
 clean:
 	rm -fr bin/*
